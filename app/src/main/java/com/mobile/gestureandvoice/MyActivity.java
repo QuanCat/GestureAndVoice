@@ -2,6 +2,8 @@ package com.mobile.gestureandvoice;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -24,8 +27,10 @@ import java.util.List;
 public class MyActivity extends Activity{
 
     EditText nameTxt, phoneTxt, emailTxt, addressTxt;
+    ImageView contactImg;
     List<Contact> contacts = new ArrayList<Contact>();
     ListView contactListView;
+    Uri imageUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,7 @@ public class MyActivity extends Activity{
         emailTxt = (EditText) findViewById(R.id.txtEmail);
         addressTxt = (EditText) findViewById(R.id.txtAddress);
         contactListView = (ListView) findViewById(R.id.listView);
+        contactImg = (ImageView) findViewById(R.id.imgViewContactImage);
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("creator");
@@ -47,14 +53,16 @@ public class MyActivity extends Activity{
         tabSpec.setContent(R.id.tabContactList);
         tabSpec.setIndicator("List");
         tabHost.addTab(tabSpec);
-        //button
+        //button clickListener
         final Button addBtn = (Button) findViewById(R.id.btnAdd);
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Toast.makeText(getApplicationContext(), "Your Contact has been Created!", Toast.LENGTH_SHORT).show();
-                addContact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(),
-                        addressTxt.getText().toString());
+                /*addContact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(),
+                        addressTxt.getText().toString());*/
+                contacts.add(new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(),
+                        addressTxt.getText().toString(), imageUri));
                 populateList();
                 Toast.makeText(getApplicationContext(), nameTxt.getText().toString() + "has been added to your contacts",
                         Toast.LENGTH_SHORT).show();
@@ -77,6 +85,26 @@ public class MyActivity extends Activity{
 
             }
         });
+        //image clickListener
+        contactImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Contact Image"), 1);
+            }
+        });
+    }
+    //get image
+    public void onActivityResult(int reqCode, int resCode, Intent data) {
+        if (resCode == RESULT_OK) {
+            if (reqCode == 1) {
+                //image
+                imageUri = data.getData();
+                contactImg.setImageURI(data.getData());
+            }
+        }
     }
 
     //populate the contacts
@@ -84,10 +112,10 @@ public class MyActivity extends Activity{
         ArrayAdapter<Contact> adapter = new ContactListAdapter();
         contactListView.setAdapter(adapter);
     }
-    //Add Contact
-    private void addContact(String name, String phone, String email, String address) {
+    //Add Contact without image
+ /*   private void addContact(String name, String phone, String email, String address) {
         contacts.add(new Contact(name, phone, email, address));
-    }
+    }*/
     //Contact List
     private class ContactListAdapter extends ArrayAdapter<Contact> {
         public ContactListAdapter() {
@@ -108,6 +136,8 @@ public class MyActivity extends Activity{
             email.setText(currentContacts.get_email());
             TextView address = (TextView) view.findViewById(R.id.cAddress);
             address.setText(currentContacts.get_address());
+            ImageView ivContactImg = (ImageView) findViewById(R.id.ivContactImgDisplay);
+            ivContactImg.setImageURI(currentContacts.get_imageUri());
 
             return view;
         }

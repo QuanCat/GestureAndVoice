@@ -3,8 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MyActivity"
-    android:id="@+id/">
+    tools:context=".MyActivity" >
 
 
     <TabHost
@@ -28,12 +27,6 @@
                 android:layout_height="fill_parent">
 
                 <LinearLayout
-                    android:id="@+id/tabContactList"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:orientation="vertical"></LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/tabCreator"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
@@ -48,6 +41,14 @@
                         android:id="@+id/ldlCreatorTitle"
                         android:layout_gravity="center_horizontal|top"
                         android:autoText="false" />
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:id="@+id/imgViewContactImage"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:src="@drawable/on_user_logo" />
 
                     <EditText
                         android:layout_width="fill_parent"
@@ -95,22 +96,29 @@
                         android:layout_marginTop="20dp" />
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/tabContactList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="Large Text"
+                        android:id="@+id/textView"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="15dp" />
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/listView" />
+                </LinearLayout>
+
             </FrameLayout>
         </LinearLayout>
     </TabHost>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/textView"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="15dp" />
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/listView" />
 
 </LinearLayout>
