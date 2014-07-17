@@ -30,7 +30,9 @@ public class MyActivity extends Activity{
     ImageView contactImg;
     List<Contact> contacts = new ArrayList<Contact>();
     ListView contactListView;
-    Uri imageUri = null;
+    Uri imageUri = Uri.parse("android.resource://com.mobile.gestureandvoice/drawable/on_user_logo");
+    //db
+    DatabaseHandler dbHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,8 @@ public class MyActivity extends Activity{
         addressTxt = (EditText) findViewById(R.id.txtAddress);
         contactListView = (ListView) findViewById(R.id.listView);
         contactImg = (ImageView) findViewById(R.id.imgViewContactImage);
+        //db
+        dbHandler = new DatabaseHandler(getApplicationContext());
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("creator");
@@ -58,14 +62,25 @@ public class MyActivity extends Activity{
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //db
+                Contact contact = new Contact(dbHandler.getContactsCount(), String.valueOf(nameTxt.getText()), String.valueOf(phoneTxt.getText()),
+                        String.valueOf(emailTxt.getText()), String.valueOf(addressTxt.getText()), imageUri);
+                if (!contactExists(contact)) {
+                    dbHandler.createContact(contact);
+                    contacts.add(contact);
+                    Toast.makeText(getApplicationContext(), String.valueOf(nameTxt.getText()) + " Has Been Added to Your Contacts",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Toast.makeText(getApplicationContext(), String.valueOf(nameTxt.getText()) + "already exists, please use a different name.",
+                        Toast.LENGTH_SHORT).show();
+
                 //Toast.makeText(getApplicationContext(), "Your Contact has been Created!", Toast.LENGTH_SHORT).show();
                 /*addContact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(),
                         addressTxt.getText().toString());*/
-                contacts.add(new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(),
-                        addressTxt.getText().toString(), imageUri));
-                populateList();
-                Toast.makeText(getApplicationContext(), nameTxt.getText().toString() + "has been added to your contacts",
-                        Toast.LENGTH_SHORT).show();
+              /*  contacts.add(new Contact(0, nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(),
+                        addressTxt.getText().toString(), imageUri));*/
+
             }
         });
 
@@ -77,7 +92,7 @@ public class MyActivity extends Activity{
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                addBtn.setEnabled(!nameTxt.getText().toString().trim().isEmpty());
+                addBtn.setEnabled(String.valueOf(nameTxt.getText()).toString().trim().length() > 0);
             }
 
             @Override
@@ -95,6 +110,23 @@ public class MyActivity extends Activity{
                 startActivityForResult(Intent.createChooser(intent, "Select Contact Image"), 1);
             }
         });
+
+        if (dbHandler.getContactsCount() != 0) {
+            contacts.addAll(dbHandler.getAllContacts());
+        }
+        populateList();
+
+    }
+    //check is the contact exists
+    private boolean contactExists(Contact contact) {
+        String name = contact.get_name();
+        int contactCount = contacts.size();
+        for (int i = 0; i < contactCount; i++) {
+            if (name.compareToIgnoreCase(contacts.get(i).get_name()) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
     //get image
     public void onActivityResult(int reqCode, int resCode, Intent data) {
@@ -138,6 +170,7 @@ public class MyActivity extends Activity{
             address.setText(currentContacts.get_address());
             ImageView ivContactImg = (ImageView) findViewById(R.id.ivContactImgDisplay);
             ivContactImg.setImageURI(currentContacts.get_imageUri());
+            System.out.print("-----------------------------"+currentContacts.get_imageUri());
 
             return view;
         }
