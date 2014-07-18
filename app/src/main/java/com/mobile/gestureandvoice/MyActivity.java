@@ -7,10 +7,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,13 +28,18 @@ import java.util.List;
 
 public class MyActivity extends Activity{
 
+    private static final int GESTURE = 0, VOICE = 1, DELETE = 2;
+
     EditText nameTxt, phoneTxt, emailTxt, addressTxt;
     ImageView contactImg;
     List<Contact> contacts = new ArrayList<Contact>();
     ListView contactListView;
-    Uri imageUri = Uri.parse("android.resource://com.mobile.gestureandvoice/drawable/on_user_logo");
+    Uri imageUri = Uri.parse("android.resource://com.mobile.gestureandvoice/drawable/on_user_logo.png");
     //db
     DatabaseHandler dbHandler;
+    //edit,delete contacts
+    int longClickedItemIndex;
+    ArrayAdapter<Contact> contactAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +53,19 @@ public class MyActivity extends Activity{
         contactImg = (ImageView) findViewById(R.id.imgViewContactImage);
         //db
         dbHandler = new DatabaseHandler(getApplicationContext());
+
+        //edit,delete item from list
+        registerForContextMenu(contactListView);
+        contactListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // i -> position
+                longClickedItemIndex = i;
+                return false;
+            }
+        });
+
+        //tab
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("creator");
@@ -63,15 +83,20 @@ public class MyActivity extends Activity{
             @Override
             public void onClick(View view) {
                 //db
+                populateList();
                 Contact contact = new Contact(dbHandler.getContactsCount(), String.valueOf(nameTxt.getText()), String.valueOf(phoneTxt.getText()),
                         String.valueOf(emailTxt.getText()), String.valueOf(addressTxt.getText()), imageUri);
                 if (!contactExists(contact)) {
                     dbHandler.createContact(contact);
                     contacts.add(contact);
+                    //notify database has been changed
+                    contactAdapter.notifyDataSetChanged();
                     Toast.makeText(getApplicationContext(), String.valueOf(nameTxt.getText()) + " Has Been Added to Your Contacts",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+
                 Toast.makeText(getApplicationContext(), String.valueOf(nameTxt.getText()) + "already exists, please use a different name.",
                         Toast.LENGTH_SHORT).show();
 
@@ -114,8 +139,47 @@ public class MyActivity extends Activity{
         if (dbHandler.getContactsCount() != 0) {
             contacts.addAll(dbHandler.getAllContacts());
         }
-        populateList();
 
+    }
+
+    //pop-up window
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+
+        //create menu
+        menu.setHeaderIcon(R.drawable.pencil_icon);
+        menu.setHeaderTitle("Contact Options");
+        //menu.add(Menu.NONE, EDIT, menu.NONE, "Edit Contact");
+        //menu.add(Menu.NONE, DELETE, menu.NONE, "Delete Contact");
+        menu.add(Menu.NONE, GESTURE, menu.NONE, "Gesture");
+        menu.add(Menu.NONE, VOICE, menu.NONE, "Voice");
+        menu.add(Menu.NONE, DELETE, menu.NONE, "Delete");
+    }
+
+    public boolean onContextItemSelected(MenuItem item) {
+        System.out.println("-----------787878--------" + item.getItemId());
+        switch (item.getItemId()) {
+
+            case GESTURE:
+                try {
+                    Class gestureClass = Class.forName("com.mobile.gestureandvoice.GestureActivity");
+                    Intent intentGesture = new Intent(MyActivity.this, gestureClass);
+                    startActivity(intentGesture);
+                } catch (ClassNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                //TODO: Implement editing a contact
+                break;
+            case VOICE:
+                break;
+            case DELETE:
+                dbHandler.deleteContact(contacts.get(longClickedItemIndex));
+                contacts.remove(longClickedItemIndex);
+                contactAdapter.notifyDataSetChanged();
+                break;
+        }
+        return super.onContextItemSelected(item);
     }
     //check is the contact exists
     private boolean contactExists(Contact contact) {
@@ -141,8 +205,8 @@ public class MyActivity extends Activity{
 
     //populate the contacts
     private void populateList() {
-        ArrayAdapter<Contact> adapter = new ContactListAdapter();
-        contactListView.setAdapter(adapter);
+        contactAdapter = new ContactListAdapter();
+        contactListView.setAdapter(contactAdapter);
     }
     //Add Contact without image
  /*   private void addContact(String name, String phone, String email, String address) {
@@ -160,6 +224,7 @@ public class MyActivity extends Activity{
                 view = getLayoutInflater().inflate(R.layout.listview_contact, parent, false);
             }
             Contact currentContacts = contacts.get(position);
+            System.out.println(currentContacts);
             TextView name = (TextView) view.findViewById(R.id.contactName);
             name.setText(currentContacts.get_name());
             TextView phone = (TextView) view.findViewById(R.id.phoneNumber);
@@ -168,9 +233,11 @@ public class MyActivity extends Activity{
             email.setText(currentContacts.get_email());
             TextView address = (TextView) view.findViewById(R.id.cAddress);
             address.setText(currentContacts.get_address());
-            ImageView ivContactImg = (ImageView) findViewById(R.id.ivContactImgDisplay);
-            ivContactImg.setImageURI(currentContacts.get_imageUri());
-            System.out.print("-----------------------------"+currentContacts.get_imageUri());
+            ImageView ivContactImg = (ImageView) view.findViewById(R.id.ivContactImgDisplay);
+            //System.out.println("**********************"+currentContacts.get_imageUri());
+            //ivContactImg.setImageURI(currentContacts.get_imageUri());
+
+            //System.out.print("-----------------------------"+currentContacts.get_imageUri());
 
             return view;
         }
