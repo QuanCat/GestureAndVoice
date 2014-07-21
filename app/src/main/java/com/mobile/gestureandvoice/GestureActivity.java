@@ -35,14 +35,14 @@ public class GestureActivity extends Activity implements OnGesturePerformedListe
         gestureOverlayView.addView(inflate);
         gestureOverlayView.addOnGesturePerformedListener(this);
 
-        //gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
-        if (!gestureLib.load()) {
+        gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
+        /*if (!gestureLib.load()) {
             Log.i("debug", "FAILED");
         } else {
             Log.i("debug", "LOADED");
-        }
+        }*/
         setContentView(gestureOverlayView);
-        Log.i("debug", "onCreate");
+        //Log.i("debug", "onCreate");
 
     }
 
@@ -53,6 +53,7 @@ public class GestureActivity extends Activity implements OnGesturePerformedListe
             Prediction prediction = predictions.get(0);
             if (prediction.score > 1) {
                 String str = prediction.name;
+                System.out.println("@@@@@@@@@@@@@@@@@@@@@@@" + str);
                 if (str.equals("E")) {
                     Toast.makeText(getApplicationContext(), "E", Toast.LENGTH_SHORT).show();
                 } else if (str.equals("N")) {

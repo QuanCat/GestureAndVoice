@@ -1,11 +1,9 @@
 package com.mobile.gestureandvoice;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -24,9 +22,6 @@ import java.util.Calendar;
 public class VoiceActivity extends Activity{
 
     private static final String TAG = VoiceActivity.class.getName();
-
-    //wake-lock to keep screen on
-    protected PowerManager.WakeLock mWakeLock;
 
     //speech recognizer for callbacks
     private SpeechRecognizer mSpeechRecognizer;
@@ -77,10 +72,7 @@ public class VoiceActivity extends Activity{
 
         mSpeechIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
-        //acquire the wake-lock to keep the screen on until user exits/closes app
-        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, TAG);
-        this.mWakeLock.acquire();
+
         mSpeechRecognizer.startListening(mSpeechIntent);
         super.onStart();
     }
@@ -92,7 +84,7 @@ public class VoiceActivity extends Activity{
     private String getResponse(int command){
         Calendar c = Calendar.getInstance();
 
-        String retString =  "I'm sorry, Dave. I'm afraid I can't do that.";
+        String retString =  "You can speak now!";
         SimpleDateFormat dfDate_day;
         switch (command) {
             case 0:
@@ -104,10 +96,6 @@ public class VoiceActivity extends Activity{
                 retString= " Today is " + dfDate_day.format(c.getTime());
                 break;
             case 2:
-                retString = "My name is R.A.L. - Responsive Android Language program";
-                break;
-
-            case 3:
                 killCommanded = true;
                 break;
 
@@ -125,7 +113,6 @@ public class VoiceActivity extends Activity{
             mSpeechRecognizer = null;
 
         }
-        this.mWakeLock.release();
         super.onPause();
     }
 
@@ -151,7 +138,7 @@ public class VoiceActivity extends Activity{
     }
     class SpeechListener implements RecognitionListener {
         public void onBufferReceived(byte[] buffer) {
-            Log.d(TAG, "buffer recieved ");
+            Log.d(TAG, "buffer received ");
         }
         public void onError(int error) {
             //if critical error then exit
@@ -192,13 +179,12 @@ public class VoiceActivity extends Activity{
 
         }
         public void onRmsChanged(float rmsdB) {
-            //			Log.d(TAG, "rms changed");
         }
         public void onBeginningOfSpeech() {
-            Log.d(TAG, "speach begining");
+            Log.d(TAG, "speech beginning");
         }
         public void onEndOfSpeech() {
-            Log.d(TAG, "speach done");
+            Log.d(TAG, "speech done");
         }
 
     };
