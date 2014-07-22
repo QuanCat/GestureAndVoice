@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Please Input the Letter:"
+        android:text="Please Write the Letter:"
         android:id="@+id/textView"
         android:layout_gravity="center_vertical" />
 
@@ -17,18 +17,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="N: New Contact"
+        android:text="n: New Contact"
         android:id="@+id/tvN" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="D: Delete Contact"
+        android:text="d: Delete Contact"
         android:id="@+id/tvD" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="E: Edit Contact"
+        android:text="e: Edit Contact"
         android:id="@+id/tvE" />
+    <android.gesture.GestureOverlayView
+        android:id="@+id/gestures"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1.0"
+        />
 </LinearLayout>

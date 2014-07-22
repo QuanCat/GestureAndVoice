@@ -88,12 +88,10 @@ public class VoiceActivity extends Activity{
         SimpleDateFormat dfDate_day;
         switch (command) {
             case 0:
-                dfDate_day= new SimpleDateFormat("HH:mm:ss");
-                retString = "The time is " + dfDate_day.format(c.getTime());
+
                 break;
             case 1:
-                dfDate_day = new SimpleDateFormat("dd/MM/yyyy");
-                retString= " Today is " + dfDate_day.format(c.getTime());
+
                 break;
             case 2:
                 killCommanded = true;
@@ -117,7 +115,7 @@ public class VoiceActivity extends Activity{
     }
 
     private void processCommand(ArrayList<String> matchStrings){
-        String response = "I'm sorry, Dave. I'm afraid I can't do that.";
+        String response = "I'm sorry.";
         int maxStrings = matchStrings.size();
         boolean resultFound = false;
         for(int i =0; i < VALID_COMMANDS_SIZE && !resultFound;i++){

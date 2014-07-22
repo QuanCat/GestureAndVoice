@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
@@ -28,7 +29,7 @@ import java.util.List;
 
 public class MyActivity extends Activity{
 
-    private static final int GESTURE = 0, VOICE = 1, DELETE = 2;
+    private static final int GESTURE = 0, VOICE = 1;
 
     EditText nameTxt, phoneTxt, emailTxt, addressTxt;
     ImageView contactImg;
@@ -40,6 +41,7 @@ public class MyActivity extends Activity{
     //edit,delete contacts
     int longClickedItemIndex;
     ArrayAdapter<Contact> contactAdapter;
+
 
 
     @Override
@@ -62,6 +64,7 @@ public class MyActivity extends Activity{
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 // i -> position
                 longClickedItemIndex = i;
+
                 return false;
             }
         });
@@ -81,6 +84,7 @@ public class MyActivity extends Activity{
         //populate the list tab
         populateList();
         //Add Contact Button clickListener
+
         final Button addBtn = (Button) findViewById(R.id.btnAdd);
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,15 +102,8 @@ public class MyActivity extends Activity{
                     return;
                 }
 
-
-                Toast.makeText(getApplicationContext(), String.valueOf(nameTxt.getText()) + "already exists, please use a different name.",
+                Toast.makeText(getApplicationContext(), String.valueOf(nameTxt.getText()) + " already exists, please use a different name.",
                         Toast.LENGTH_SHORT).show();
-
-                //Toast.makeText(getApplicationContext(), "Your Contact has been Created!", Toast.LENGTH_SHORT).show();
-                /*addContact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(),
-                        addressTxt.getText().toString());*/
-              /*  contacts.add(new Contact(0, nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(),
-                        addressTxt.getText().toString(), imageUri));*/
 
             }
         });
@@ -151,11 +148,8 @@ public class MyActivity extends Activity{
         //create menu
         menu.setHeaderIcon(R.drawable.pencil_icon);
         menu.setHeaderTitle("Contact Options");
-        //menu.add(Menu.NONE, EDIT, menu.NONE, "Edit Contact");
-        //menu.add(Menu.NONE, DELETE, menu.NONE, "Delete Contact");
         menu.add(Menu.NONE, GESTURE, menu.NONE, "Gesture");
         menu.add(Menu.NONE, VOICE, menu.NONE, "Voice");
-        menu.add(Menu.NONE, DELETE, menu.NONE, "Delete");
     }
 
     public boolean onContextItemSelected(MenuItem item) {
@@ -165,28 +159,31 @@ public class MyActivity extends Activity{
                 try {
                     Class gestureClass = Class.forName("com.mobile.gestureandvoice.GestureActivity");
                     Intent intentGesture = new Intent(MyActivity.this, gestureClass);
+                    intentGesture.putExtra("contactIndex", longClickedItemIndex);
+                    intentGesture.putParcelableArrayListExtra("contacts", (ArrayList<? extends Parcelable>) contacts);
                     startActivity(intentGesture);
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-
                 break;
             case VOICE:
                 try {
                     Class voiceClass = Class.forName("com.mobile.gestureandvoice.VoiceActivity");
                     Intent intentVoice = new Intent(MyActivity.this, voiceClass);
+                    intentVoice.putExtra("contactIndex", longClickedItemIndex);
+                    intentVoice.putParcelableArrayListExtra("contacts", (ArrayList<? extends Parcelable>) contacts);
                     startActivity(intentVoice);
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 break;
-            case DELETE:
+            /*case DELETE:
                 dbHandler.deleteContact(contacts.get(longClickedItemIndex));
                 contacts.remove(longClickedItemIndex);
                 contactAdapter.notifyDataSetChanged();
-                break;
+                break;*/
         }
         return super.onContextItemSelected(item);
     }
@@ -229,11 +226,12 @@ public class MyActivity extends Activity{
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
+
             if (view == null) {
                 view = getLayoutInflater().inflate(R.layout.listview_contact, parent, false);
             }
             Contact currentContacts = contacts.get(position);
-            System.out.println(currentContacts);
+
             TextView name = (TextView) view.findViewById(R.id.contactName);
             name.setText(currentContacts.get_name());
             TextView phone = (TextView) view.findViewById(R.id.phoneNumber);
@@ -243,11 +241,7 @@ public class MyActivity extends Activity{
             TextView address = (TextView) view.findViewById(R.id.cAddress);
             address.setText(currentContacts.get_address());
             ImageView ivContactImg = (ImageView) view.findViewById(R.id.ivContactImgDisplay);
-            System.out.println("**********************"+ivContactImg);
-            /*if (!ivContactImg.equals(null)) {
-                ivContactImg.setImageURI(currentContacts.get_imageUri());
-            }*/
-
+            //ivContactImg.setImageURI(currentContacts.get_imageUri());
             return view;
         }
     }

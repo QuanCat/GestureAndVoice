@@ -95,7 +95,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_NAME, contact.get_phone());
         values.put(KEY_EMAIL, contact.get_email());
         values.put(KEY_ADDRESS, contact.get_address());
-        values.put(KEY_IMAGEUri, contact.get_imageUri().toString());
+
+        try {
+            values.put(KEY_IMAGEUri, contact.get_imageUri().toString());
+        } catch(NullPointerException npe) {
+            System.out.println("Sorry, you don't have the picture!");
+        }
 
         int rowsAffected = db.update(TABLE_CONTACTS, values, KEY_ID + "=?", new String[] {String.valueOf(contact.get_id())});
         db.close();
