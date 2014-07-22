@@ -92,8 +92,8 @@ public class GestureActivity extends Activity implements OnGesturePerformedListe
                     contacts.remove(longClickedItemIndex);
                     //something wrong here
                     contactAdapter.notifyDataSetChanged();
-                    //direct to Contact List
-
+                    //how to direct to Contact List?
+                    //TODO:how to direct to the list?
                 }
 
             }

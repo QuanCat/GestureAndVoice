@@ -92,7 +92,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, contact.get_name());
-        values.put(KEY_NAME, contact.get_phone());
+        values.put(KEY_PHONE, contact.get_phone());
         values.put(KEY_EMAIL, contact.get_email());
         values.put(KEY_ADDRESS, contact.get_address());
 
